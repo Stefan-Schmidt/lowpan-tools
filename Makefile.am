@@ -2,7 +2,7 @@ include $(top_srcdir)/Makefile.common
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib addrdb src tests test-serial
+SUBDIRS = lib addrdb src tests test-serial lowpan-perf
 if IP_PLUGIN
 SUBDIRS += iplink
 endif

@@ -22,6 +22,12 @@ AC_ARG_WITH(zbtestdir, [AC_HELP_STRING([--with-zbtestdir],
 	    [zbtestdir='${libexecdir}/lowpan-tools'])
 AC_SUBST(zbtestdir)
 
+AC_ARG_WITH(zbperfdir, [AC_HELP_STRING([--with-zbperfdir],
+	    [directory where all performance test programs will be installed])],
+	    [zbperfdir=$withval],
+	    [zbperfdir='${libexecdir}/lowpan-tools'])
+AC_SUBST(zbperfdir)
+
 AC_ARG_WITH(iproutedir, [AC_HELP_STRING([--with-iproutedir],
 	    [directory where iproute2 plugins will be installed])],
 	    [iproutedir=$withval],
@@ -138,5 +144,6 @@ AC_CONFIG_FILES([
 	iplink/Makefile
 	tests/Makefile
 	test-serial/Makefile
+	lowpan-perf/Makefile
 ])
 AC_OUTPUT
