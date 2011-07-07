@@ -51,9 +51,6 @@ extern struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1];
 #define PACKET_ROUNDTRIP	2
 #define PACKET_THROUGHPUT	3
 
-/* 100 miliseconds wait to avoid driver bug */
-//unsigned int sleep_time = 120000;
-
 #ifdef HAVE_GETOPT_LONG
 static const struct option perf_long_opts[] = {
 	{ "server", required_argument, NULL, 's' },
@@ -179,7 +176,6 @@ int fire_throughput_packets(struct config *conf, int sd) {
 		generate_packet(buf, conf, i);
 		send(sd, buf, conf->packet_len, 0);
 		printf("Packet %i fired\n", i);
-//		usleep(250000); /* Wait to avoid driver bug */
 	}
 	free(buf);
 	return 0;
@@ -228,7 +224,6 @@ int measure_throughput(struct config *conf, int sd) {
 			printf("Hit packet timeout\n");
 
 		memset(buf, 0, MAX_PAYLOAD_LEN);
-//		usleep(sleep_time); /* Wait to avoid driver bug */
 	}
 	gettimeofday(&end_time, NULL);
 	sec = end_time.tv_sec - start_time.tv_sec;
@@ -297,7 +292,6 @@ int measure_roundtrip(struct config *conf, int sd) {
 			printf("Pong in %li seconds and %li usecs\n", sec, usec);
 		} else
 			printf("Hit packet timeout\n");
-//		usleep(sleep_time); /* Wait to avoid driver bug */
 	}
 	printf("Received %i from %i packets\n", count, conf->packets);
 	printf("Arithmetic mean rountrip time: %f seconds and %f usecs\n",
