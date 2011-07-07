@@ -79,7 +79,16 @@ struct config {
 extern char *optarg;
 
 void usage(const char *name) {
-	printf("Usage: %s FIXME\n", name);
+	printf("Usage: %s OPTIONS\n"
+	"OPTIONS:\n"
+	"--server |-s client address\n"
+	"--client | -c server address\n"
+	"--packets | -p number of packets\n"
+	"--length | -l packet length\n"
+	"--roundtrip | -r start in roundtrip mode\n"
+	"--throughput | -t start in throughput mode\n"
+	"--version | -v print out version\n"
+	"--help This usage text\n", name);
 }
 
 int get_interface_info(struct config *conf) {
@@ -433,7 +442,7 @@ int main(int argc, char *argv[]) {
 			return 1;
 		case 'h':
 			usage(argv[0]);
-			break;
+			return 1;
 		default:
 			usage(argv[0]);
 			return 1;
