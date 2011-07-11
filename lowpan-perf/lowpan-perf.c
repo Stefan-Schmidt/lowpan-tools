@@ -67,7 +67,7 @@ static const struct option perf_long_opts[] = {
 
 struct config {
 	char packet_len;
-	int packets;
+	unsigned short packets;
 	long dst_addr;
 	long src_addr;
 	int pan_id;
@@ -164,11 +164,11 @@ int generate_packet(unsigned char *buf, struct config *conf, int seq_num) {
 
 int parse_flags(struct config *conf, unsigned char *buf) {
 
+	conf->packet_len = buf[0];
 	conf->packet_type = buf[1];
-	if (conf->packet_type == PACKET_CONFIG && buf[3] != 0xAB)
-		conf->packets = buf[3];
-	if (conf->packet_type == PACKET_CONFIG && buf[4] != 0xAB)
-		conf->packet_len = buf[4];
+	if (conf->packet_type == PACKET_CONFIG && buf[3] != 0xAB && buf[4] != 0xAB)
+		conf->packets = (buf[3] << 8) | buf[4];
+
 	return 0;
 }
 
@@ -205,8 +205,8 @@ int measure_throughput(struct config *conf, int sd) {
 
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 	generate_packet(buf, conf, 1);
-	buf[3] = conf->packets;
-	buf[4] = conf->packet_len;
+	buf[3] = conf->packets >> 8; /* Upper byte */
+	buf[4] = conf->packets & 0xFF; /* Lower byte */
 	//dump_packet(buf, conf->packet_len);
 	send(sd, buf, conf->packet_len, 0);
 
