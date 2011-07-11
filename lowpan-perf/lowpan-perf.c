@@ -197,6 +197,7 @@ int measure_throughput(struct config *conf, int sd) {
 	struct timeval start_time, end_time, timeout;
 	long sec, usec;
 	int count;
+	float throughput;
 
 	printf("Start throughput measurement...\n");
 
@@ -241,8 +242,9 @@ int measure_throughput(struct config *conf, int sd) {
 		usec += 1000000;
 		sec--;
 	}
+	throughput = len_sum / ((float)sec + (float)usec/1000000);
 	printf("Received %i bytes in %li seconds and %li usec => %f Bytes/second\n",
-		(int)len_sum, sec, usec, (float)len_sum/(float)sec);
+		(int)len_sum, sec, usec, throughput);
 
 	free(buf);
 	return 0;
