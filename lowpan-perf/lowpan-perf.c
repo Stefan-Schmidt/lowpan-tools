@@ -185,7 +185,7 @@ int fire_throughput_packets(struct config *conf, int sd) {
 		memset(buf, 0, MAX_PAYLOAD_LEN);
 		generate_packet(buf, conf, i);
 		send(sd, buf, conf->packet_len, 0);
-		printf("Packet %i fired\n", i);
+//		printf("Packet %i fired\n", i);
 	}
 	free(buf);
 	return 0;
