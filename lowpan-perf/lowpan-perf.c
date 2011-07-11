@@ -199,6 +199,7 @@ int measure_throughput(struct config *conf, int sd) {
 	long sec, usec;
 	int count;
 	float throughput;
+	unsigned short seq_num;
 
 	printf("Start throughput measurement...\n");
 
@@ -220,12 +221,13 @@ int measure_throughput(struct config *conf, int sd) {
 	for (i = 0; i < conf->packets; i++) {
 		len = recv(sd, buf, conf->packet_len, 0);
 		len_sum += len;
-		printf("Packet with sequenze numer %i arrived\n", buf[2]);
-		if (count > ((buf[2] << 8) | buf[3])) {
+		seq_num = (buf[2] << 8) | buf[3];
+		printf("Packet with sequenze numer %i arrived\n", seq_num);
+		if (count > seq_num) {
 			printf("Sequenze number did not match.\n");
 			//continue;
 		}
-		printf("Got %i, expected %i\n", buf[2], count);
+		printf("Got %i, expected %i\n", seq_num, count);
 		if (len > 0) {
 			if (i == 0)
 				gettimeofday(&start_time, NULL);
@@ -278,7 +280,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 		send(sd, buf, conf->packet_len, 0);
 		gettimeofday(&start_time, NULL);
 		ret = recv(sd, buf, conf->packet_len, 0);
-		if (seq_num != buf[2]) {
+		if (seq_num != ((buf[2] << 8)| buf[3])) {
 			printf("Sequenze number did not match\n");
 			continue;
 		}
