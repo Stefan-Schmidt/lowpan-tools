@@ -131,7 +131,7 @@ int get_interface_info(struct config *conf) {
 	return 0;
 }
 
-void dump_packet(char *buf, int len) {
+void dump_packet(unsigned char *buf, int len) {
 	int i;
 
 	printf("Packet payload:");
@@ -141,7 +141,7 @@ void dump_packet(char *buf, int len) {
 	printf("\n");
 }
 
-int generate_packet(char *buf, struct config *conf, int seq_num) {
+int generate_packet(unsigned char *buf, struct config *conf, int seq_num) {
 	int i;
 
 	/* Max payload size 115 byte */
@@ -162,7 +162,7 @@ int generate_packet(char *buf, struct config *conf, int seq_num) {
 	return 0;
 }
 
-int parse_flags(struct config *conf, char *buf) {
+int parse_flags(struct config *conf, unsigned char *buf) {
 
 	conf->packet_type = buf[1];
 	if (conf->packet_type == PACKET_CONFIG && buf[3] != 0xAB)
@@ -173,12 +173,12 @@ int parse_flags(struct config *conf, char *buf) {
 }
 
 int fire_throughput_packets(struct config *conf, int sd) {
-	char *buf;
+	unsigned char *buf;
 	int i;
 
 	conf->packet_type = PACKET_THROUGHPUT;
 
-	buf = (char *)malloc(MAX_PAYLOAD_LEN);
+	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	for (i = 0; i < conf->packets; i++) {
 		memset(buf, 0, MAX_PAYLOAD_LEN);
@@ -193,7 +193,7 @@ int fire_throughput_packets(struct config *conf, int sd) {
 int measure_throughput(struct config *conf, int sd) {
 	int i;
 	ssize_t len, len_sum = 1;
-	char *buf;
+	unsigned char *buf;
 	struct timeval start_time, end_time, timeout;
 	long sec, usec;
 	int count;
@@ -203,7 +203,7 @@ int measure_throughput(struct config *conf, int sd) {
 
 	conf->packet_type = PACKET_CONFIG;
 
-	buf = (char *)malloc(MAX_PAYLOAD_LEN);
+	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 	generate_packet(buf, conf, 1);
 	buf[3] = conf->packets;
 	buf[4] = conf->packet_len;
@@ -251,7 +251,7 @@ int measure_throughput(struct config *conf, int sd) {
 }
 
 int measure_roundtrip(struct config *conf, int sd) {
-	char *buf;
+	unsigned char *buf;
 	struct timeval start_time, end_time, timeout;
 	long sec = 0, usec = 0;
 	long sec_max = 0, usec_max = 0;
@@ -262,7 +262,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 	printf("Start roundtrip time measurement...\n");
 
 	conf->packet_type = PACKET_ROUNDTRIP;
-	buf = (char *)malloc(MAX_PAYLOAD_LEN);
+	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	/* 2 seconds packet receive timeout */
 	timeout.tv_sec = 2;
@@ -315,7 +315,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 
 void init_server(struct config *conf, int sd) {
 	ssize_t len;
-	char *buf;
+	unsigned char *buf;
 //	struct sockaddr_ieee802154 src;
 //	socklen_t addrlen;
 
@@ -323,7 +323,7 @@ void init_server(struct config *conf, int sd) {
 
 	len = 0;
 	printf("Server mode. Waiting for packets...\n");
-	buf = (char *)malloc(MAX_PAYLOAD_LEN);
+	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	while (1) {
 		//len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
