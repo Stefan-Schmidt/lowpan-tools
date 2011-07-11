@@ -141,7 +141,7 @@ void dump_packet(unsigned char *buf, int len) {
 	printf("\n");
 }
 
-int generate_packet(unsigned char *buf, struct config *conf, int seq_num) {
+int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_num) {
 	int i;
 
 	/* Max payload size 115 byte */
@@ -154,8 +154,9 @@ int generate_packet(unsigned char *buf, struct config *conf, int seq_num) {
 
 	buf[0] = conf->packet_len;
 	buf[1] = conf->packet_type;
-	buf[2] = seq_num;
-	for (i = 3; i < conf->packet_len; i++) {
+	buf[2] = seq_num >> 8; /* Upper byte */
+	buf[3] = seq_num & 0xFF; /* Lower byte */
+	for (i = 4; i < conf->packet_len; i++) {
 		buf[i] = 0xAB;
 	}
 
@@ -166,8 +167,8 @@ int parse_flags(struct config *conf, unsigned char *buf) {
 
 	conf->packet_len = buf[0];
 	conf->packet_type = buf[1];
-	if (conf->packet_type == PACKET_CONFIG && buf[3] != 0xAB && buf[4] != 0xAB)
-		conf->packets = (buf[3] << 8) | buf[4];
+	if (conf->packet_type == PACKET_CONFIG && buf[4] != 0xAB && buf[5] != 0xAB)
+		conf->packets = (buf[4] << 8) | buf[5];
 
 	return 0;
 }
@@ -205,8 +206,8 @@ int measure_throughput(struct config *conf, int sd) {
 
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 	generate_packet(buf, conf, 1);
-	buf[3] = conf->packets >> 8; /* Upper byte */
-	buf[4] = conf->packets & 0xFF; /* Lower byte */
+	buf[4] = conf->packets >> 8; /* Upper byte */
+	buf[5] = conf->packets & 0xFF; /* Lower byte */
 	//dump_packet(buf, conf->packet_len);
 	send(sd, buf, conf->packet_len, 0);
 
@@ -220,7 +221,7 @@ int measure_throughput(struct config *conf, int sd) {
 		len = recv(sd, buf, conf->packet_len, 0);
 		len_sum += len;
 		printf("Packet with sequenze numer %i arrived\n", buf[2]);
-		if (count > buf[2]) {
+		if (count > ((buf[2] << 8) | buf[3])) {
 			printf("Sequenze number did not match.\n");
 			//continue;
 		}
@@ -257,7 +258,8 @@ int measure_roundtrip(struct config *conf, int sd) {
 	long sec_max = 0, usec_max = 0;
 	long sec_min = 2147483647, usec_min = 2147483647;
 	long sum_sec = 0, sum_usec = 0;
-	int i, ret, count, seq_num;
+	int i, ret, count;
+	unsigned short seq_num;
 
 	printf("Start roundtrip time measurement...\n");
 
@@ -272,7 +274,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 	count = 0;
 	for (i = 0; i < conf->packets; i++) {
 		generate_packet(buf, conf, i);
-		seq_num = buf[2];
+		seq_num = (buf[2] << 8)| buf[3];
 		send(sd, buf, conf->packet_len, 0);
 		gettimeofday(&start_time, NULL);
 		ret = recv(sd, buf, conf->packet_len, 0);
