@@ -222,16 +222,16 @@ int measure_throughput(struct config *conf, int sd) {
 		len = recv(sd, buf, conf->packet_len, 0);
 		len_sum += len;
 		seq_num = (buf[2] << 8) | buf[3];
-		printf("Packet with sequenze numer %i arrived\n", seq_num);
+//		printf("Packet with sequenze numer %i arrived\n", seq_num);
 		if (count > seq_num) {
-			printf("Sequenze number did not match.\n");
+//			printf("Sequenze number did not match.\n");
 			//continue;
 		}
-		printf("Got %i, expected %i\n", seq_num, count);
+//		printf("Got %i, expected %i\n", seq_num, count);
 		if (len > 0) {
 			if (i == 0)
 				gettimeofday(&start_time, NULL);
-			printf("Packet %i arrived\n", count);
+//			printf("Packet %i arrived\n", count);
 			count++;
 		} else
 			printf("Hit packet timeout\n");
@@ -281,7 +281,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 		gettimeofday(&start_time, NULL);
 		ret = recv(sd, buf, conf->packet_len, 0);
 		if (seq_num != ((buf[2] << 8)| buf[3])) {
-			printf("Sequenze number did not match\n");
+//			printf("Sequenze number did not match\n");
 			continue;
 		}
 		if (ret > 0) {
@@ -304,7 +304,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 				usec_max = usec;
 			else if (usec < usec_min)
 				usec_min = usec;
-			printf("Pong in %li seconds and %li usecs\n", sec, usec);
+//			printf("Pong in %li seconds and %li usecs\n", sec, usec);
 		} else
 			printf("Hit packet timeout\n");
 	}
@@ -332,7 +332,7 @@ void init_server(struct config *conf, int sd) {
 	while (1) {
 		//len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
 		len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
-		printf("Received %zd bytes ", len);
+//		printf("Received %zd bytes ", len);
 		//dump_packet(buf, len);
 		parse_flags(conf, buf);
 		/* Roundtrip mode: send same packet back */
