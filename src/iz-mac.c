@@ -226,6 +226,80 @@ static iz_res_t list_finish(struct iz_cmd *cmd)
 	return IZ_STOP_OK;
 }
 
+/******************/
+/* SET handling  */
+/******************/
+
+static iz_res_t set_parse(struct iz_cmd *cmd)
+{
+	cmd->flags = NLM_F_REQUEST;
+	return IZ_CONT_OK;
+}
+
+static iz_res_t set_request(struct iz_cmd *cmd, struct nl_msg *msg)
+{
+	char *dummy;
+	uint16_t pan_id, short_addr;
+	uint8_t chan;
+
+	if (!cmd->argv[1])
+		return IZ_STOP_ERR;
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
+
+	if (!cmd->argv[2])
+		return IZ_STOP_ERR;
+	pan_id = strtol(cmd->argv[2], &dummy, 16);
+	if (*dummy) {
+		printf("Bad PAN ID!\n");
+		return IZ_STOP_ERR;
+	}
+	NLA_PUT_U16(msg, IEEE802154_ATTR_COORD_PAN_ID, pan_id);
+
+	if (!cmd->argv[3])
+		return IZ_STOP_ERR;
+	short_addr = strtol(cmd->argv[3], &dummy, 16);
+	if (*dummy) {
+		printf("Bad short address!\n");
+		return IZ_STOP_ERR;
+	}
+	NLA_PUT_U16(msg, IEEE802154_ATTR_COORD_SHORT_ADDR, short_addr);
+
+	if (!cmd->argv[4])
+		return IZ_STOP_ERR;
+	chan = strtol(cmd->argv[4], &dummy, 10);
+	if (*dummy) {
+		printf("Bad channel number!\n");
+		return IZ_STOP_ERR;
+	}
+	NLA_PUT_U8(msg, IEEE802154_ATTR_CHANNEL, chan);
+
+	/* set all unneeded attributes to 0*/
+	NLA_PUT_U8(msg, IEEE802154_ATTR_PAN_COORD, 0);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_BCN_ORD, 0);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_SF_ORD, 0);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_BAT_EXT, 0);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_COORD_REALIGN, 0);
+
+	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
+}
+
+static iz_res_t set_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	if (!attrs[IEEE802154_ATTR_SHORT_ADDR] ||
+		!attrs[IEEE802154_ATTR_STATUS] )
+		return IZ_STOP_ERR;
+
+	printf("Set PAN ID %04hx, short address %04hx, status %i\n",
+		nla_get_u16(attrs[IEEE802154_ATTR_COORD_PAN_ID]),
+		nla_get_u16(attrs[IEEE802154_ATTR_SHORT_ADDR]),
+		nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]));
+
+	return IZ_STOP_OK;
+}
+
 /************************/
 /* ASSOCIATE handling   */
 /************************/
@@ -431,6 +505,16 @@ const struct iz_cmd_desc mac_commands[] = {
 		.request	= list_request,
 		.response	= list_response,
 		.finish		= list_finish,
+	},
+	{
+		.name		= "set",
+		.usage		= "<iface> <pan> <addr> <channel>",
+		.doc		= "Set address, channel and pan for an interface.",
+		.nl_cmd		= IEEE802154_START_REQ,
+		.nl_resp	= IEEE802154_START_CONF,
+		.parse		= set_parse,
+		.request	= set_request,
+		.response	= set_response,
 	},
 	{}
 };
