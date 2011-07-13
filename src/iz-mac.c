@@ -181,7 +181,7 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 {
 	char * dev_name;
 	char * phy_name = NULL;
-	uint32_t dev_index;
+	//uint32_t dev_index;
 	unsigned char hw_addr[IEEE802154_ADDR_LEN];
 	uint16_t short_addr;
 	uint16_t pan_id;
@@ -197,7 +197,7 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 
 	/* Get attribute values from the message */
 	dev_name = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
-	dev_index = nla_get_u32(attrs[IEEE802154_ATTR_DEV_INDEX]);
+	//dev_index = nla_get_u32(attrs[IEEE802154_ATTR_DEV_INDEX]);
 	nla_memcpy(hw_addr, attrs[IEEE802154_ATTR_HW_ADDR],
 		IEEE802154_ADDR_LEN);
 	short_addr = nla_get_u16(attrs[IEEE802154_ATTR_SHORT_ADDR]);

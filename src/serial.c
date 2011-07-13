@@ -42,7 +42,7 @@
 #define N_ZB 19
 
 int main(int argc, char **argv) {
-	int fd, ret, s;
+	int fd, ret;
 
 	if (argc == 1 || !strcmp(argv[1], "--version")) {
 		printf(	"izattach " VERSION "\n"
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
 		return 6;
 	}
 
-	s = socket(PF_IEEE802154, SOCK_RAW, 0);
+	//s = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (ret < 0) {
 		perror("socket");
 		return 7;
