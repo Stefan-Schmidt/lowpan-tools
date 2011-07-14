@@ -373,7 +373,7 @@ int init_network(struct config *conf) {
 		perror("bind");
 		return 1;
 	}
-#if 0
+#if 1
 	/* Connect to other side */
 	a.addr.short_addr = conf->dst_addr;
 	ret = connect(sd, (struct sockaddr *)&a, sizeof(a));
