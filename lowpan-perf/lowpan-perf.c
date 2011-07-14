@@ -320,18 +320,18 @@ int measure_roundtrip(struct config *conf, int sd) {
 void init_server(struct config *conf, int sd) {
 	ssize_t len;
 	unsigned char *buf;
-//	struct sockaddr_ieee802154 src;
-//	socklen_t addrlen;
+	struct sockaddr_ieee802154 src;
+	socklen_t addrlen;
 
-//	addrlen = sizeof(src);
+	addrlen = sizeof(src);
 
 	len = 0;
 	printf("Server mode. Waiting for packets...\n");
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	while (1) {
-		//len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
-		len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
+		len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
+		//len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
 //		printf("Received %zd bytes ", len);
 		//dump_packet(buf, len);
 		parse_flags(conf, buf);
