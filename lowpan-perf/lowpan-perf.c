@@ -321,17 +321,32 @@ void init_server(struct config *conf, int sd) {
 	ssize_t len;
 	unsigned char *buf;
 	struct sockaddr_ieee802154 src;
-	socklen_t addrlen;
+//	socklen_t addrlen;
 
-	addrlen = sizeof(src);
+	unsigned int sender_len;
+	struct msghdr msg;
+	struct iovec iov;
+	char line[10];
+
+	//addrlen = sizeof(src);
 
 	len = 0;
 	printf("Server mode. Waiting for packets...\n");
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	while (1) {
-		printf("Struct init values from 0x%04x on PAN 0x%04x\n", src.addr.short_addr, src.addr.pan_id);
-		len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
+		//len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
+		sender_len = sizeof(src);
+		msg.msg_name = &src;
+		msg.msg_namelen = sender_len;
+		msg.msg_iov = &iov;
+		msg.msg_iovlen = 1;
+		msg.msg_iov->iov_base = line;
+		msg.msg_iov->iov_len = 10;
+		msg.msg_control = 0;
+		msg.msg_controllen = 0;
+		msg.msg_flags = 0;
+		recvmsg(sd,&msg,0);
 		printf("Received data from 0x%04x on PAN 0x%04x\n", src.addr.short_addr, src.addr.pan_id);
 		//len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
 //		printf("Received %zd bytes ", len);
