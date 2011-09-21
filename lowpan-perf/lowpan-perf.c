@@ -331,7 +331,6 @@ void init_server(struct config *conf, int sd) {
 
 	while (1) {
 		len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
-		printf("Received data from %04x\n", src.addr.short_addr);
 		//len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
 //		printf("Received %zd bytes ", len);
 		//dump_packet(buf, len);
