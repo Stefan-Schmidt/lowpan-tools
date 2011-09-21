@@ -145,9 +145,6 @@ void dump_packet(unsigned char *buf, int len) {
 int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_num) {
 	int i;
 
-	printf("Begin conf->packet_len %i\n", conf->packet_len);
-	printf("Begin conf->packet_len_rotation %i\n", conf->packet_len_rotation);
-
 	/* Max payload size 115 byte */
 	if (conf->packet_len >= MAX_PAYLOAD_LEN)
 		conf->packet_len = MAX_PAYLOAD_LEN;
@@ -163,9 +160,6 @@ int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_
 		if (conf->packet_len_rotation == MAX_PAYLOAD_LEN + 1)
 			conf->packet_len_rotation = 5;
 	}
-
-	printf("conf->packet_len %i\n", conf->packet_len);
-	printf("conf->packet_len_rotation %i\n", conf->packet_len_rotation);
 
 	buf[0] = conf->packet_len;
 	buf[1] = conf->packet_type;
