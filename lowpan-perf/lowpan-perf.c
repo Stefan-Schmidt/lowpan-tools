@@ -337,11 +337,11 @@ void init_server(struct config *conf, int sd) {
 		parse_flags(conf, buf);
 		/* Roundtrip mode: send same packet back */
 		if (conf->packet_type == PACKET_ROUNDTRIP) {
-			printf("Entered roundtrip mode\n");
+			//printf("Entered roundtrip mode\n");
 			send(sd, buf, len, 0);
 		}
 		if (conf->packet_type == PACKET_CONFIG) {
-			printf("Entered throughput mode\n");
+			//printf("Entered throughput mode\n");
 			fire_throughput_packets(conf, sd);
 		}
 	}
