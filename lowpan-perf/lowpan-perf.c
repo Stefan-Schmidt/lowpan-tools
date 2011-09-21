@@ -161,6 +161,9 @@ int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_
 			conf->packet_len_rotation = 5;
 	}
 
+	printf("conf->packet_len %i\n", conf->packet_len);
+	printf("conf->packet_len_rotation %i\n", conf->packet_len_rotation);
+
 	buf[0] = conf->packet_len;
 	buf[1] = conf->packet_type;
 	buf[2] = seq_num >> 8; /* Upper byte */
