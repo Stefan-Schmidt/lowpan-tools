@@ -452,10 +452,10 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'p':
 			conf->packets = atoi(optarg);
-			conf->packet_len_rotation = 0;
 			break;
 		case 'l':
 			conf->packet_len = atoi(optarg);
+			conf->packet_len_rotation = 0;
 			break;
 		case 'r':
 			if (conf->mode == MODE_THROUGHPUT)
