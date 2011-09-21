@@ -67,6 +67,7 @@ static const struct option perf_long_opts[] = {
 
 struct config {
 	char packet_len;
+	char packet_len_rotation;
 	unsigned short packets;
 	long dst_addr;
 	long src_addr;
@@ -145,12 +146,20 @@ int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_
 	int i;
 
 	/* Max payload size 115 byte */
-	if (conf->packet_len >= MAX_PAYLOAD_LEN || conf->packet_len == 0)
+	if (conf->packet_len >= MAX_PAYLOAD_LEN)
 		conf->packet_len = MAX_PAYLOAD_LEN;
 
 	/* We have at least 5 byte payload for length, flags, etc*/
-	if (conf->packet_len < 5)
+	if (conf->packet_len < 5 && conf->packet_len > 0 )
 		conf->packet_len = 5;
+
+	/* Use rotation for packet length field */
+	if (conf->packet_len == 0) {
+		conf->packet_len = conf->packet_len_rotation;
+		conf->packet_len_rotation++;
+		if (conf->packet_len_rotation == MAX_PAYLOAD_LEN + 1)
+			conf->packet_len_rotation = 5;
+	}
 
 	buf[0] = conf->packet_len;
 	buf[1] = conf->packet_type;
@@ -408,6 +417,10 @@ int main(int argc, char *argv[]) {
 	struct config *conf;
 
 	conf = (struct config *) malloc(sizeof(struct config));
+
+	/* Deafult state if not set on the cli */
+	conf->packet_len = 0;
+	conf->packet_len_rotation = 5;
 
 	if (argc < 2) {
 		usage(argv[0]);
