@@ -153,11 +153,11 @@ int generate_packet(unsigned char *buf, struct config *conf, unsigned short seq_
 		conf->packet_len = MAX_PAYLOAD_LEN;
 
 	/* We have at least 5 byte payload for length, flags, etc*/
-	if (conf->packet_len < 5 && conf->packet_len > 0 )
+	if (conf->packet_len < 5)
 		conf->packet_len = 5;
 
 	/* Use rotation for packet length field */
-	if (conf->packet_len == 0) {
+	if (conf->packet_len_rotation) {
 		conf->packet_len = conf->packet_len_rotation;
 		conf->packet_len_rotation++;
 		if (conf->packet_len_rotation == MAX_PAYLOAD_LEN + 1)
@@ -425,7 +425,6 @@ int main(int argc, char *argv[]) {
 	conf = (struct config *) malloc(sizeof(struct config));
 
 	/* Deafult state if not set on the cli */
-	conf->packet_len = 0;
 	conf->packet_len_rotation = 5;
 
 	if (argc < 2) {
@@ -453,6 +452,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'p':
 			conf->packets = atoi(optarg);
+			conf->packet_len_rotation = 0;
 			break;
 		case 'l':
 			conf->packet_len = atoi(optarg);
