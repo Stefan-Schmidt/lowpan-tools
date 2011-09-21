@@ -330,7 +330,6 @@ void init_server(struct config *conf, int sd) {
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	while (1) {
-		printf("Struct init values from 0x%04x on PAN 0x%04x\n", src.addr.short_addr, src.addr.pan_id);
 		len = recvfrom(sd, buf, MAX_PAYLOAD_LEN, 0, (struct sockaddr *)&src, &addrlen);
 		printf("Received data from 0x%04x on PAN 0x%04x\n", src.addr.short_addr, src.addr.pan_id);
 		//len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
