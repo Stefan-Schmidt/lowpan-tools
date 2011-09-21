@@ -134,7 +134,7 @@ int get_interface_info(struct config *conf) {
 void dump_packet(unsigned char *buf, int len) {
 	int i;
 
-	printf("Packet payload:");
+	fprintf(stdout, "Packet payload:");
 	for (i = 0; i < len; i++) {
 		printf(" %x", buf[i]);
 	}
@@ -201,7 +201,8 @@ int measure_throughput(struct config *conf, int sd) {
 	float throughput;
 	unsigned short seq_num;
 
-	printf("Start throughput measurement...\n");
+	fprintf(stdout, "Start throughput measurement...\n");
+	fprintf(stdout, "CSV format: Sequence number, packet length\n");
 
 	conf->packet_type = PACKET_CONFIG;
 
@@ -234,7 +235,9 @@ int measure_throughput(struct config *conf, int sd) {
 //			printf("Packet %i arrived\n", count);
 			count++;
 		} else
-			printf("Hit packet timeout\n");
+			fprintf(stderr, "Hit packet timeout\n");
+
+		fprintf(stdout, "%i,%i\n", ((buf[2] << 8)| buf[3]), (int)len);
 
 		memset(buf, 0, MAX_PAYLOAD_LEN);
 	}
@@ -246,7 +249,7 @@ int measure_throughput(struct config *conf, int sd) {
 		sec--;
 	}
 	throughput = len_sum / ((float)sec + (float)usec/1000000);
-	printf("Received %i bytes in %li seconds and %li usec => %f Bytes/second\n",
+	fprintf(stdout, "Received %i bytes in %li seconds and %li usec => %f Bytes/second\n",
 		(int)len_sum, sec, usec, throughput);
 
 	free(buf);
@@ -263,7 +266,8 @@ int measure_roundtrip(struct config *conf, int sd) {
 	int i, ret, count;
 	unsigned short seq_num;
 
-	printf("Start roundtrip time measurement...\n");
+	fprintf(stdout, "Start roundtrip time measurement...\n");
+	fprintf(stdout, "CSV format: Sequence number, packet length, rtt secs, rtt usecs\n");
 
 	conf->packet_type = PACKET_ROUNDTRIP;
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
@@ -295,6 +299,9 @@ int measure_roundtrip(struct config *conf, int sd) {
 				sec--;
 				sum_sec--;
 			}
+
+			fprintf(stdout, "%i,%i,%li,%li\n", ((buf[2] << 8)| buf[3]), ret, sec, usec);
+
 			sum_usec += usec;
 			if (sec > sec_max)
 				sec_max = sec;
@@ -306,13 +313,13 @@ int measure_roundtrip(struct config *conf, int sd) {
 				usec_min = usec;
 //			printf("Pong in %li seconds and %li usecs\n", sec, usec);
 		} else
-			printf("Hit packet timeout\n");
+			fprintf(stderr, "Hit packet timeout\n");
 	}
-	printf("Received %i from %i packets\n", count, conf->packets);
-	printf("Arithmetic mean rountrip time: %f seconds and %f usecs\n",
+	fprintf(stdout, "Received %i from %i packets\n", count, conf->packets);
+	fprintf(stdout, "Arithmetic mean rountrip time: %f seconds and %f usecs\n",
 		(float)sum_sec/(float)count, (float)sum_usec/(float)count);
-	printf("Minimal time %f seconds and %f usecs\n", (float)sec_min, (float)usec_min);
-	printf("Maximal time %f seconds and %f usecs\n", (float)sec_max, (float)usec_max);
+	fprintf(stdout, "Minimal time %f seconds and %f usecs\n", (float)sec_min, (float)usec_min);
+	fprintf(stdout, "Maximal time %f seconds and %f usecs\n", (float)sec_max, (float)usec_max);
 	free(buf);
 	return 0;
 }
@@ -326,7 +333,7 @@ void init_server(struct config *conf, int sd) {
 //	addrlen = sizeof(src);
 
 	len = 0;
-	printf("Server mode. Waiting for packets...\n");
+	fprintf(stdout, "Server mode. Waiting for packets...\n");
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
 
 	while (1) {
@@ -444,7 +451,7 @@ int main(int argc, char *argv[]) {
 				conf->mode = MODE_THROUGHPUT;
 			break;
 		case 'v':
-			printf(	"lowpan-perf 0.1\n");
+			fprintf(stdout, "lowpan-perf 0.1\n");
 			return 1;
 		case 'h':
 			usage(argv[0]);
