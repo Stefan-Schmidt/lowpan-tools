@@ -275,8 +275,8 @@ int measure_roundtrip(struct config *conf, int sd) {
 	int i, ret, count;
 	unsigned short seq_num;
 
-	fprintf(stdout, "Start roundtrip time measurement...\n");
-	fprintf(stdout, "CSV format: Sequence number, packet length, rtt secs, rtt usecs\n");
+	fprintf(stderr, "Start roundtrip time measurement...\n");
+	fprintf(stderr, "CSV format: Sequence number, packet length, rtt secs, rtt usecs\n");
 
 	conf->packet_type = PACKET_ROUNDTRIP;
 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
@@ -309,7 +309,7 @@ int measure_roundtrip(struct config *conf, int sd) {
 				sum_sec--;
 			}
 
-			fprintf(stdout, "%i,%i,%li,%li\n", ((buf[2] << 8)| buf[3]), ret, sec, usec);
+			fprintf(stdout, "%i,%i,%li,%li\n", (int)seq_num, ret, sec, usec);
 
 			sum_usec += usec;
 			if (sec > sec_max)
@@ -322,13 +322,14 @@ int measure_roundtrip(struct config *conf, int sd) {
 				usec_min = usec;
 //			printf("Pong in %li seconds and %li usecs\n", sec, usec);
 		} else
-			fprintf(stderr, "Hit packet timeout\n");
+			fprintf(stdout, "%i,%i,,\n", (int)seq_num, conf->packet_len);
+			//fprintf(stderr, "Hit packet timeout\n");
 	}
-	fprintf(stdout, "Received %i from %i packets\n", count, conf->packets);
-	fprintf(stdout, "Arithmetic mean rountrip time: %f seconds and %f usecs\n",
+	fprintf(stderr, "Received %i from %i packets\n", count, conf->packets);
+	fprintf(stderr, "Arithmetic mean rountrip time: %f seconds and %f usecs\n",
 		(float)sum_sec/(float)count, (float)sum_usec/(float)count);
-	fprintf(stdout, "Minimal time %f seconds and %f usecs\n", (float)sec_min, (float)usec_min);
-	fprintf(stdout, "Maximal time %f seconds and %f usecs\n", (float)sec_max, (float)usec_max);
+	fprintf(stderr, "Minimal time %f seconds and %f usecs\n", (float)sec_min, (float)usec_min);
+	fprintf(stderr, "Maximal time %f seconds and %f usecs\n", (float)sec_max, (float)usec_max);
 	free(buf);
 	return 0;
 }
