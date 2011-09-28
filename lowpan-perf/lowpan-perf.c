@@ -219,8 +219,8 @@ int measure_throughput(struct config *conf, int sd) {
 	generate_packet(buf, conf, 1);
 	buf[4] = conf->packets >> 8; /* Upper byte */
 	buf[5] = conf->packets & 0xFF; /* Lower byte */
-	//dump_packet(buf, conf->packet_len);
-	send(sd, buf, conf->packet_len, 0);
+	//dump_packet(buf, 6);
+	send(sd, buf, 6, 0);
 
 	/* 2 seconds packet receive timeout */
 	timeout.tv_sec = 2;
