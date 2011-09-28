@@ -229,7 +229,7 @@ int measure_throughput(struct config *conf, int sd) {
 
 	len = count = 0;
 	for (i = 0; i < conf->packets; i++) {
-		len = recv(sd, buf, conf->packet_len, 0);
+		len = recv(sd, buf, MAX_PAYLOAD_LEN, 0);
 		len_sum += len;
 		seq_num = (buf[2] << 8) | buf[3];
 //		printf("Packet with sequenze numer %i arrived\n", seq_num);
